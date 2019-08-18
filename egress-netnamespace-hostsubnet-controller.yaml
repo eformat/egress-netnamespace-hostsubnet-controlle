@@ -1,0 +1,55 @@
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: DecoratorController
+metadata:
+  name: egress-netnamespace-hostsubnet-controller
+spec:
+  resources:
+  - apiVersion: v1
+    resource: namespaces
+    annotationSelector:
+      matchExpressions:
+      - {key: network-zone-egress, operator: In, values: ['true']}
+  attachments:
+  - apiVersion: network.openshift.io/v1
+    resource: netnamespaces
+    updateStrategy:
+      method: InPlace
+  hooks:
+    sync:
+      webhook:
+        url: http://egress-netnamespace-hostsubnet-controller:8080/egress-netnamespace-hostsubnet-controller
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: egress-netnamespace-hostsubnet-controller
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: egress-netnamespace-hostsubnet-controller
+    spec:
+      containers:
+      - name: hooks
+        image: docker.io/metacontroller/jsonnetd:0.1
+        imagePullPolicy: Always
+        workingDir: /hooks
+        volumeMounts:
+        - name: hooks
+          mountPath: /hooks
+      volumes:
+      - name: hooks
+        configMap:
+          name: egress-netnamespace-hostsubnet-controller
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: egress-netnamespace-hostsubnet-controller
+spec:
+  selector:
+    app: egress-netnamespace-hostsubnet-controller
+  ports:
+  - port: 8080
+    targetPort: 8080

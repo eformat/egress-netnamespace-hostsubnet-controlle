@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-ns
+  annotations:
+    network-zone-egress: 'true'
+    network-zone-egress.egressIP: '192.168.130.100'
+  creationTimestamp: null
+  labels:
+    name: test-ns
+spec:
+  finalizers:
+  - kubernetes
