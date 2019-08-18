@@ -68,3 +68,6 @@ Delete the namespace (we also need to bounce the egress netnamespace controller 
 oc delete -f test-namespace.yaml
 oc delete pod -l app=egress-netnamespace-hostsubnet-controller -n metacontroller
 ```
+
+## TODO
+- add in support for egress hostsubnet

@@ -5,6 +5,7 @@ metadata:
   annotations:
     network-zone-egress: 'true'
     network-zone-egress.egressIP: '192.168.130.100'
+    network-zone-egress.egressHosts: i1,i2
   creationTimestamp: null
   labels:
     name: test-ns

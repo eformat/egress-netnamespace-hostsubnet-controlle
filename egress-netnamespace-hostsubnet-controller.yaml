@@ -14,6 +14,10 @@ spec:
     resource: netnamespaces
     updateStrategy:
       method: InPlace
+  - apiVersion: network.openshift.io/v1
+    resource: hostsubnets
+    updateStrategy:
+      method: InPlace      
   hooks:
     sync:
       webhook:
