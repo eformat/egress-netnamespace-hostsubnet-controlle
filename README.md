@@ -39,21 +39,32 @@ oc create configmap egress-netnamespace-hostsubnet-controller --from-file=egress
 oc apply -f egress-netnamespace-hostsubnet-controller.yaml
 ```
 
-# Test
+Hack - we need to fool the metacontroller into believing it created the resource, else we get an 'already created' error (the netnamesapce controller owns this resource intially)
+```
+oc apply -f test-namespace.yaml
+oc annotate --overwrite netnamespace test-ns metacontroller.k8s.io/decorator-controller=egress-netnamespace-hostsubnet-controller
+nsuid=$(oc get namespace test-ns -o jsonpath="{.metadata.uid}")
+oc patch netnamespace test-ns -p '{"metadata":{"ownerReferences":[{"apiVersion":"v1","blockOwnerDeletion":true,"controller":true,"kind":"Namespace","name":"test-ns","uid": "'$nsuid'"}]}}'
+```
 
+# Test
 Create a test namespace
 
 ```
 oc apply -f ./test-namespace.yaml
 ```
 
-make sure netnamespace egressip is created
-
+make sure netnamespace egress ip is created
 ```
-oc get networkpolicy -n namespace-np-controller-test
+oc get netnamespace
 
-NAME                       POD-SELECTOR   AGE
-allow-from-red-dmz-infra   <none>         14s
-allow-from-self            <none>         14s
-allow-from-welcome         <none>         14s
-```# egress-netnamespace-hostsubnet-controlle
+NAME                                NETID      EGRESS IPS
+test-ns                             6154464    [192.168.130.100]
+```
+
+# Tidy up
+Delete the namespace (we also need to bounce the egress netnamespace controller pod, else we will cache the ownership - and get 0 netid is we recreate the namesapces - not ideal)
+```
+oc delete -f test-namespace.yaml
+oc delete pod -l app=egress-netnamespace-hostsubnet-controller -n metacontroller
+```
