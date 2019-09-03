@@ -8,12 +8,15 @@ annotation example (these go on a service object):
   annotations:
     network-zone-egress: 'true'
     network-zone-egress.egressIP: 192.168.130.100
+    network-zone-egress.egressCIDR: 192.168.130.0/24
     network-zone-egress.egressHosts: i1,i2
 ```
 
 `network-zone-egress: 'true'`- enable egress NetNamespace and Hostubnet annotations
 
 `network-zone-egress.egressIP: 192.168.130.100` - egress ip address for namespace
+
+`network-zone-egress.egressCIDR: 192.168.130.0/24` - hosting egress CIDR range for egress hosts
 
 `network-zone-egress.egressHosts: i1,i2` - router(s) to host namesapce ip's (more than one for HA)
 
@@ -75,8 +78,8 @@ make sure the hostsubnet is allocted and serving from one of the routers
 oc get hostsubnet
 
 NAME   HOST   HOST IP          SUBNET          EGRESS CIDRS           EGRESS IPS
-i1     i1     192.168.130.14   10.128.2.0/23   [192.168.130.100/32]   [192.168.130.100]
-i2     i2     192.168.130.15   10.131.0.0/23   [192.168.130.100/32]   []
+i1     i1     192.168.130.14   10.128.2.0/23   [192.168.130.100/24]   [192.168.130.100]
+i2     i2     192.168.130.15   10.131.0.0/23   [192.168.130.100/24]   []
 ```
 
 # Tidy up

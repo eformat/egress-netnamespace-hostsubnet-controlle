@@ -1,6 +1,7 @@
 function(request) {
   local namespace = request.object,
   local egressIP = namespace.metadata.annotations["network-zone-egress.egressIP"],
+  local egressCIDR = namespace.metadata.annotations["network-zone-egress.egressCIDR"],
   local egressHosts = std.split(namespace.metadata.annotations["network-zone-egress.egressHosts"],","),
 
   // Create a NetNamespace for each namespace
@@ -8,7 +9,7 @@ function(request) {
     {
       apiVersion: "network.openshift.io/v1",
       kind: "HostSubnet",
-      egressCIDRs: [ egressIP + '/32' ],
+      egressCIDRs: [ egressCIDR ],
       host: eh,
       metadata: {
         name: eh
